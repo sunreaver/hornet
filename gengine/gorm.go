@@ -58,7 +58,7 @@ func (ge *GormEngine) check() {
 	for {
 		select {
 		case <-t.C:
-			ge.dbs.CheckAndReplace(func(newOne int) {
+			ge.dbs.CheckAndReplace(func(newOne int) bool {
 				// 有替换发生
 				if newOne >= 0 && newOne < len(ge.dbs) {
 					newDB := ge.dbs[newOne]
@@ -66,8 +66,10 @@ func (ge *GormEngine) check() {
 						fmt.Println("replace", newOne, db.uri)
 						ge.DB = db.DB
 						ge.repair()
+						return true
 					}
 				}
+				return false
 			})
 		case <-ge.stop:
 			ge.DB.Close()

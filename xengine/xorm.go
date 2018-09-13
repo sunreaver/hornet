@@ -96,7 +96,7 @@ func (xe *XormEngine) check() {
 	for {
 		select {
 		case <-t.C:
-			xe.dbs.CheckAndReplace(func(newOne int) {
+			xe.dbs.CheckAndReplace(func(newOne int) bool {
 				// 有替换发生
 				if newOne >= 0 && newOne < len(xe.dbs) {
 					newDB := xe.dbs[newOne]
@@ -104,8 +104,10 @@ func (xe *XormEngine) check() {
 						fmt.Println("replace", newOne, db.uri)
 						xe.Engine = db.Engine
 						xe.repair()
+						return true
 					}
 				}
+				return false
 			})
 		case <-xe.stop:
 			xe.Engine.Close()

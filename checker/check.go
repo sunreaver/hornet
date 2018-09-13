@@ -7,7 +7,7 @@ type Checker interface {
 
 type Checkers []Checker
 
-func (cs *Checkers) CheckAndReplace(fn func(newOne int)) {
+func (cs *Checkers) CheckAndReplace(repalce func(newOne int) bool) {
 	if len(*cs) == 0 {
 		return
 	}
@@ -21,10 +21,11 @@ func (cs *Checkers) CheckAndReplace(fn func(newOne int)) {
 		if c.Ping() == nil || c.ReConnect() == nil {
 			// 可用ping通
 			// 重连后没问题
-			fn(i)
-			// 保持master在0位
-			(*cs)[0], (*cs)[i] = (*cs)[i], (*cs)[0]
-			break
+			if repalce(i) {
+				// 保持master在0位
+				(*cs)[0], (*cs)[i] = (*cs)[i], (*cs)[0]
+				break
+			}
 		}
 	}
 }
