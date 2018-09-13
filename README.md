@@ -6,21 +6,39 @@
 ## 软件架构
 
 ├── README.md
+
 ├── checker 抽象的checker接口，提供ping和reconnect
+
 │   └── check.go
+
 ├── config 提供配置
+
 │   ├── config.go
+
 │   └── errors.go
+
 ├── gengine gorm的engine
+
 │   ├── gorm.go
+
 │   └── gormEngineChecker.go
+
 ├── ormengine.go 对外接口，创建engine
+
 └── xengine xorm的engine
+
     ├── xorm.go
+
     └── xormEngineChecker.go
 
 
-## 使用教程
+
+## 如何获取
+
+`go get -u -v gitee.com/JMArch/hornet`
+
+## 使用说明
+
 
 #### 1. gorm
 
@@ -92,12 +110,6 @@ func main() {
 	// db.Insert(...)
 }
 ```
-
-## 使用说明
-
-1. xxxx
-2. xxxx
-3. xxxx
 
 ## 参与贡献
 
