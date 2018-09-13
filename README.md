@@ -1,25 +1,105 @@
 # hornet
 
-#### 项目介绍
+## 项目介绍
 提供了高可用支持的gorm&xorm
 
-#### 软件架构
-软件架构说明
+## 软件架构
+
+├── README.md
+├── checker 抽象的checker接口，提供ping和reconnect
+│   └── check.go
+├── config 提供配置
+│   ├── config.go
+│   └── errors.go
+├── gengine gorm的engine
+│   ├── gorm.go
+│   └── gormEngineChecker.go
+├── ormengine.go 对外接口，创建engine
+└── xengine xorm的engine
+    ├── xorm.go
+    └── xormEngineChecker.go
 
 
-#### 安装教程
+## 使用教程
+
+#### 1. gorm
+
+```golang
+import (
+	"gitee.com/JMArch/hornet"
+	"gitee.com/JMArch/hornet/config"
+	"gitee.com/JMArch/hornet/gengine"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
+)
+
+func main() {
+	// mysql
+	dbTmp, e := hornet.NewOrm("gorm", config.OrmEngineConfig{
+		Dialect: "mysql",
+		Uris: []string{
+			"root:123456@tcp(localhost:3307)/t_test?charset=utf8&parseTime=True&loc=Local",
+			"root:123456@tcp(localhost:3308)/t_test?charset=utf8&parseTime=True&loc=Local",
+		},
+	})
+	// sqlite3
+	//dbTmp, e := hornet.NewOrm("gorm", config.OrmEngineConfig{
+	//	Dialect: "sqlite3",
+	//	Uris: []string{
+	//		"./local.db",
+	//	},
+	//})
+	if e != nil {
+		panic(e.Error())
+	}
+	db := dbTmp.(*gengine.GormEngine)
+
+	// Do Your Business logic
+	// db.FirstOrCreate(...)
+)
+```
+
+#### 2. xorm
+
+```golang
+import (
+	"fmt"
+	"time"
+
+	"gitee.com/JMArch/hornet"
+	"gitee.com/JMArch/hornet/config"
+	"gitee.com/JMArch/hornet/gengine"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-xorm/core"
+)
+
+func main() {
+	dbTmp, e := hornet.NewOrm("xorm", config.OrmEngineConfig{
+		Dialect: "mysql",
+		Uris: []string{
+			"root:123456@tcp(localhost:3307)/t_test?charset=utf8&parseTime=True&loc=Local",
+			"root:123456@tcp(localhost:3308)/t_test?charset=utf8&parseTime=True&loc=Local",
+		},
+	})
+	if e != nil {
+		panic(e.Error())
+	}
+
+	db := dbTmp.(*gengine.GormEngine)
+
+	// Do Your Business logic
+	// db.Insert(...)
+}
+```
+
+## 使用说明
 
 1. xxxx
 2. xxxx
 3. xxxx
 
-#### 使用说明
-
-1. xxxx
-2. xxxx
-3. xxxx
-
-#### 参与贡献
+## 参与贡献
 
 1. Fork 本项目
 2. 新建 Feat_xxx 分支
@@ -27,7 +107,7 @@
 4. 新建 Pull Request
 
 
-#### 码云特技
+## 码云特技
 
 1. 使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
 2. 码云官方博客 [blog.gitee.com](https://blog.gitee.com)
