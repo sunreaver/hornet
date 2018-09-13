@@ -5,33 +5,21 @@
 
 ## 软件架构
 
+```
 ├── README.md
-
 ├── checker 抽象的checker接口，提供ping和reconnect
-
 │   └── check.go
-
 ├── config 提供配置
-
 │   ├── config.go
-
 │   └── errors.go
-
 ├── gengine gorm的engine
-
 │   ├── gorm.go
-
 │   └── gormEngineChecker.go
-
 ├── ormengine.go 对外接口，创建engine
-
 └── xengine xorm的engine
-
     ├── xorm.go
-
     └── xormEngineChecker.go
-
-
+```
 
 ## 如何获取
 
