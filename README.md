@@ -63,6 +63,10 @@ func main() {
 
 	// Do Your Business logic
 	// db.FirstOrCreate(...)
+
+
+	// exit
+	db.DestroyEngine()
 )
 ```
 
@@ -96,6 +100,10 @@ func main() {
 
 	// Do Your Business logic
 	// db.Insert(...)
+
+
+	// exit
+	db.DestroyEngine()
 }
 ```
 

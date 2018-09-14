@@ -27,9 +27,12 @@ type GormEngine struct {
 
 // StopEngine
 func (ge *GormEngine) DestroyEngine() {
+	ge.Lock()
+	defer ge.Unlock()
 	if ge.stoped {
 		return
 	}
+	ge.stoped = true
 	close(ge.stop)
 	return
 }

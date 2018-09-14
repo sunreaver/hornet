@@ -39,9 +39,12 @@ type XormEngine struct {
 
 // StopEngine
 func (xe *XormEngine) DestroyEngine() {
+	xe.Lock()
+	defer xe.Unlock()
 	if xe.stoped {
 		return
 	}
+	xe.stoped = true
 	close(xe.stop)
 	return
 }
