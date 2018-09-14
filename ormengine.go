@@ -9,17 +9,17 @@ import (
 )
 
 // NewGorm NewGorm
-func newGorm(cfg config.OrmEngineConfig) (*gengine.GormEngine, error) {
-	return gengine.NewGormEngine(cfg)
+func newGorm(cfg config.OrmEngineConfig) (*gengine.Orm, error) {
+	return gengine.NewOrm(cfg)
 }
 
 // NewXorm NewXorm
-func newXorm(cfg config.OrmEngineConfig) (*xengine.XormEngine, error) {
-	return xengine.NewXormEngine(cfg)
+func newXorm(cfg config.OrmEngineConfig) (*xengine.Orm, error) {
+	return xengine.NewOrm(cfg)
 }
 
 func NewOrm(t string, cfg config.OrmEngineConfig) (interface{}, error) {
-	switch cfg.Type {
+	switch t {
 	case "gorm":
 		return newGorm(cfg)
 	case "xorm":

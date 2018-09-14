@@ -10,11 +10,11 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// GormEngine GormEngine
-type GormEngine struct {
+// Orm Orm
+type Orm struct {
 	*gorm.DB
-	sync.RWMutex
-	dbs checker.Checkers
+	lock sync.RWMutex
+	dbs  checker.Checkers
 
 	log               *logger
 	loggerMode        *bool
@@ -26,18 +26,18 @@ type GormEngine struct {
 }
 
 // StopEngine
-func (ge *GormEngine) DestroyEngine() {
-	ge.Lock()
-	defer ge.Unlock()
+func (ge *Orm) DestroyEngine() bool {
+	ge.lock.Lock()
+	defer ge.lock.Unlock()
 	if ge.stoped {
-		return
+		return false
 	}
 	ge.stoped = true
 	close(ge.stop)
-	return
+	return true
 }
 
-func (ge *GormEngine) repair() {
+func (ge *Orm) repair() {
 	if ge.log != nil {
 		ge.DB.SetLogger(*ge.log)
 	}
@@ -56,7 +56,7 @@ type logger interface {
 	Print(v ...interface{})
 }
 
-func (ge *GormEngine) check() {
+func (ge *Orm) check() {
 	t := time.NewTicker(time.Millisecond * 10)
 	for {
 		select {
@@ -88,27 +88,27 @@ func (ge *GormEngine) check() {
 }
 
 // SetLogger 设置logger（拦截logger设置）
-func (ge *GormEngine) SetLogger(log logger) {
+func (ge *Orm) SetLogger(log logger) {
 	ge.log = &log
 	ge.DB.SetLogger(log)
 }
 
-func (ge *GormEngine) LogMode(enable bool) *gorm.DB {
+func (ge *Orm) LogMode(enable bool) *gorm.DB {
 	ge.loggerMode = &enable
 	return ge.DB.LogMode(enable)
 }
 
-func (ge *GormEngine) BlockGlobalUpdate(enable bool) *gorm.DB {
+func (ge *Orm) BlockGlobalUpdate(enable bool) *gorm.DB {
 	ge.blockGlobalUpdate = &enable
 	return ge.DB.BlockGlobalUpdate(enable)
 }
 
-func (ge *GormEngine) SingularTable(enable bool) {
+func (ge *Orm) SingularTable(enable bool) {
 	ge.singularTable = &enable
 	ge.DB.SingularTable(enable)
 }
 
-func NewGormEngine(cfg config.OrmEngineConfig) (*GormEngine, error) {
+func NewOrm(cfg config.OrmEngineConfig) (*Orm, error) {
 	if e := cfg.Verify(); e != nil {
 		return nil, e
 	}
@@ -144,11 +144,11 @@ func NewGormEngine(cfg config.OrmEngineConfig) (*GormEngine, error) {
 
 	// master保证在0位
 	dbs[0], dbs[masterIndex] = dbs[masterIndex], dbs[0]
-	out := &GormEngine{
-		DB:      master,
-		dbs:     dbs,
-		RWMutex: sync.RWMutex{},
-		stop:    make(chan bool, 1),
+	out := &Orm{
+		lock: sync.RWMutex{},
+		DB:   master,
+		dbs:  dbs,
+		stop: make(chan bool, 1),
 	}
 
 	go out.check()

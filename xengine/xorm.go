@@ -11,11 +11,11 @@ import (
 	"github.com/go-xorm/xorm"
 )
 
-// XormEngine XormEngine
-type XormEngine struct {
+// Orm Orm
+type Orm struct {
 	*xorm.Engine
-	sync.RWMutex
-	dbs checker.Checkers
+	lock sync.RWMutex
+	dbs  checker.Checkers
 
 	logger             *core.ILogger
 	level              *core.LogLevel
@@ -37,19 +37,19 @@ type XormEngine struct {
 	stoped bool
 }
 
-// StopEngine
-func (xe *XormEngine) DestroyEngine() {
-	xe.Lock()
-	defer xe.Unlock()
+// DestroyEngine DestroyEngine
+func (xe *Orm) DestroyEngine() bool {
+	xe.lock.Lock()
+	defer xe.lock.Unlock()
 	if xe.stoped {
-		return
+		return false
 	}
 	xe.stoped = true
 	close(xe.stop)
-	return
+	return true
 }
 
-func (xe *XormEngine) repair() {
+func (xe *Orm) repair() {
 	if xe.logger != nil {
 		xe.Engine.SetLogger(*xe.logger)
 	}
@@ -94,7 +94,7 @@ func (xe *XormEngine) repair() {
 	}
 }
 
-func (xe *XormEngine) check() {
+func (xe *Orm) check() {
 	t := time.NewTicker(time.Second * 1)
 	for {
 		select {
@@ -125,23 +125,23 @@ func (xe *XormEngine) check() {
 	t.Stop()
 }
 
-func (xe *XormEngine) SetLogger(logger core.ILogger) {
+func (xe *Orm) SetLogger(logger core.ILogger) {
 	xe.logger = &logger
 	xe.Engine.SetLogger(logger)
 }
 
-func (xe *XormEngine) SetLogLevel(level core.LogLevel) {
+func (xe *Orm) SetLogLevel(level core.LogLevel) {
 	xe.level = &level
 	xe.Engine.SetLogLevel(level)
 }
 
 // SetDisableGlobalCache disable global cache or not
-func (xe *XormEngine) SetDisableGlobalCache(disable bool) {
+func (xe *Orm) SetDisableGlobalCache(disable bool) {
 	xe.disableGlobalCache = &disable
 	xe.Engine.SetDisableGlobalCache(disable)
 }
 
-func (xe *XormEngine) SetCacher(tableName string, cacher core.Cacher) {
+func (xe *Orm) SetCacher(tableName string, cacher core.Cacher) {
 	xe.cacherLock.Lock()
 	xe.cachers[tableName] = cacher
 	xe.cacherLock.Unlock()
@@ -149,77 +149,77 @@ func (xe *XormEngine) SetCacher(tableName string, cacher core.Cacher) {
 }
 
 // SetMapper set the name mapping rules
-func (xe *XormEngine) SetMapper(mapper core.IMapper) {
+func (xe *Orm) SetMapper(mapper core.IMapper) {
 	xe.tableMapper = &mapper
 	xe.columnMapper = &mapper
 	xe.Engine.SetMapper(mapper)
 }
 
 // SetTableMapper set the table name mapping rule
-func (xe *XormEngine) SetTableMapper(mapper core.IMapper) {
+func (xe *Orm) SetTableMapper(mapper core.IMapper) {
 	xe.tableMapper = &mapper
 	xe.Engine.SetTableMapper(mapper)
 }
 
 // SetColumnMapper set the column name mapping rule
-func (xe *XormEngine) SetColumnMapper(mapper core.IMapper) {
+func (xe *Orm) SetColumnMapper(mapper core.IMapper) {
 	xe.columnMapper = &mapper
 	xe.Engine.SetColumnMapper(mapper)
 }
 
 // SetDefaultCacher set the default cacher. Xorm's default not enable cacher.
-func (xe *XormEngine) SetDefaultCacher(cacher core.Cacher) {
+func (xe *Orm) SetDefaultCacher(cacher core.Cacher) {
 	xe.cacher = &cacher
 	xe.Engine.SetDefaultCacher(cacher)
 }
 
-func (xe *XormEngine) SetMaxOpenConns(conns int) {
+func (xe *Orm) SetMaxOpenConns(conns int) {
 	xe.maxOpenConns = &conns
 	xe.Engine.SetMaxOpenConns(conns)
 }
 
 // SetMaxIdleConns set the max idle connections on pool, default is 2
-func (xe *XormEngine) SetMaxIdleConns(conns int) {
+func (xe *Orm) SetMaxIdleConns(conns int) {
 	xe.maxIdleConns = &conns
 	xe.Engine.SetMaxIdleConns(conns)
 }
 
-func (xe *XormEngine) MapCacher(bean interface{}, cacher core.Cacher) error {
+func (xe *Orm) MapCacher(bean interface{}, cacher core.Cacher) error {
 	xe.SetCacher(xe.Engine.TableName(bean, true), cacher)
 	return nil
 }
 
 // SetTZLocation sets time zone of the application
-func (xe *XormEngine) SetTZLocation(tz *time.Location) {
+func (xe *Orm) SetTZLocation(tz *time.Location) {
 	xe.tzLocation = &tz
 	xe.Engine.SetTZLocation(tz)
 }
 
 // SetTZDatabase sets time zone of the database
-func (xe *XormEngine) SetTZDatabase(tz *time.Location) {
+func (xe *Orm) SetTZDatabase(tz *time.Location) {
 	xe.databaseTZ = &tz
 	xe.Engine.SetTZDatabase(tz)
 }
 
 // SetSchema sets the schema of database
-func (xe *XormEngine) SetSchema(schema string) {
+func (xe *Orm) SetSchema(schema string) {
 	xe.schema = &schema
 	xe.Engine.SetSchema(schema)
 }
 
 // ShowExecTime show SQL statement and execute time or not on logger if log level is great than INFO
-func (xe *XormEngine) ShowExecTime(show ...bool) {
+func (xe *Orm) ShowExecTime(show ...bool) {
 	xe.showExecTime = show
 	xe.Engine.ShowExecTime(show...)
 }
 
 // ShowSQL show SQL statement or not on logger if log level is great than INFO
-func (xe *XormEngine) ShowSQL(show ...bool) {
+func (xe *Orm) ShowSQL(show ...bool) {
 	xe.showSQL = show
 	xe.Engine.ShowSQL(show...)
 }
 
-func NewXormEngine(cfg config.OrmEngineConfig) (*XormEngine, error) {
+func NewOrm(cfg config.OrmEngineConfig) (*Orm, error) {
 	if e := cfg.Verify(); e != nil {
 		return nil, e
 	}
@@ -255,10 +255,10 @@ func NewXormEngine(cfg config.OrmEngineConfig) (*XormEngine, error) {
 
 	// master保证在0位
 	dbs[0], dbs[masterIndex] = dbs[masterIndex], dbs[0]
-	out := &XormEngine{
+	out := &Orm{
 		Engine:     master,
+		lock:       sync.RWMutex{},
 		dbs:        dbs,
-		RWMutex:    sync.RWMutex{},
 		stop:       make(chan bool, 1),
 		cachers:    map[string]core.Cacher{},
 		cacherLock: sync.RWMutex{},

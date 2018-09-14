@@ -2,8 +2,6 @@ package config
 
 // OrmEngineConfig OrmEngineConfig
 type OrmEngineConfig struct {
-	// Type
-	Type string
 	// Dialect 驱动: mysql, sqlite3 ...
 	Dialect string
 	// Uris db hosts
