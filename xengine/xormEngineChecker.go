@@ -11,6 +11,7 @@ type XormEngineChecker struct {
 	diaect string
 }
 
+// Ping Ping
 func (xec *XormEngineChecker) Ping() (e error) {
 	if xec != nil {
 		return xec.Engine.Ping()
@@ -18,6 +19,7 @@ func (xec *XormEngineChecker) Ping() (e error) {
 	return nil
 }
 
+// ReConnect ReConnect
 func (xec *XormEngineChecker) ReConnect() (e error) {
 	tmp, e := xorm.NewEngine(xec.diaect, xec.uri)
 	if e != nil {

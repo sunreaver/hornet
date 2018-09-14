@@ -96,6 +96,7 @@ func (xe *Orm) repair() {
 
 func (xe *Orm) check() {
 	t := time.NewTicker(time.Second * 1)
+CHECKING:
 	for {
 		select {
 		case <-t.C:
@@ -119,17 +120,19 @@ func (xe *Orm) check() {
 					db.Close()
 				}
 			}
-			return
+			break CHECKING
 		}
 	}
 	t.Stop()
 }
 
+// SetLogger SetLogger
 func (xe *Orm) SetLogger(logger core.ILogger) {
 	xe.logger = &logger
 	xe.Engine.SetLogger(logger)
 }
 
+// SetLogLevel SetLogLevel
 func (xe *Orm) SetLogLevel(level core.LogLevel) {
 	xe.level = &level
 	xe.Engine.SetLogLevel(level)
@@ -141,6 +144,7 @@ func (xe *Orm) SetDisableGlobalCache(disable bool) {
 	xe.Engine.SetDisableGlobalCache(disable)
 }
 
+// SetCacher SetCacher
 func (xe *Orm) SetCacher(tableName string, cacher core.Cacher) {
 	xe.cacherLock.Lock()
 	xe.cachers[tableName] = cacher
@@ -173,6 +177,7 @@ func (xe *Orm) SetDefaultCacher(cacher core.Cacher) {
 	xe.Engine.SetDefaultCacher(cacher)
 }
 
+// SetMaxOpenConns is only available for go 1.2+
 func (xe *Orm) SetMaxOpenConns(conns int) {
 	xe.maxOpenConns = &conns
 	xe.Engine.SetMaxOpenConns(conns)
@@ -184,6 +189,7 @@ func (xe *Orm) SetMaxIdleConns(conns int) {
 	xe.Engine.SetMaxIdleConns(conns)
 }
 
+// MapCacher MapCacher
 func (xe *Orm) MapCacher(bean interface{}, cacher core.Cacher) error {
 	xe.SetCacher(xe.Engine.TableName(bean, true), cacher)
 	return nil
@@ -219,6 +225,7 @@ func (xe *Orm) ShowSQL(show ...bool) {
 	xe.Engine.ShowSQL(show...)
 }
 
+// NewOrm NewOrm
 func NewOrm(cfg config.OrmEngineConfig) (*Orm, error) {
 	if e := cfg.Verify(); e != nil {
 		return nil, e
