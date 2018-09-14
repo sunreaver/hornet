@@ -8,14 +8,15 @@ type OrmEngineConfig struct {
 	Uris []string
 }
 
+// Verify Verify
 func (oec *OrmEngineConfig) Verify() error {
 	switch oec.Dialect {
 	case "mysql", "sqlite3", "postgres":
 	default:
-		return NoDialect
+		return ErrNoDialect
 	}
 	if len(oec.Uris) == 0 {
-		return NoUris
+		return ErrNoUris
 	}
 
 	return nil

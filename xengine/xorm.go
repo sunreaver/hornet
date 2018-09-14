@@ -257,7 +257,7 @@ func NewOrm(cfg config.OrmEngineConfig) (*Orm, error) {
 		}
 	}
 	if masterIndex == -1 {
-		return nil, fmt.Errorf("%v. [%v]", config.NoAvailableHost, err)
+		return nil, fmt.Errorf("%v. [%v]", config.ErrNoAvailableHost, err)
 	}
 
 	// master保证在0位

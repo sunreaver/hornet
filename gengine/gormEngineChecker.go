@@ -9,6 +9,7 @@ type GormEngineChecker struct {
 	diaect string
 }
 
+// Ping Ping
 func (gec *GormEngineChecker) Ping() error {
 	if gec != nil {
 		if db := gec.DB.DB(); db != nil {
@@ -18,6 +19,7 @@ func (gec *GormEngineChecker) Ping() error {
 	return nil
 }
 
+// ReConnect ReConnect
 func (gec *GormEngineChecker) ReConnect() error {
 	tmp, e := gorm.Open(gec.diaect, gec.uri)
 	if e != nil {

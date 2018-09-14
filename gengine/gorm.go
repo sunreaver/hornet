@@ -25,7 +25,7 @@ type Orm struct {
 	stoped bool
 }
 
-// StopEngine
+// DestroyEngine DestroyEngine
 func (ge *Orm) DestroyEngine() bool {
 	ge.lock.Lock()
 	defer ge.lock.Unlock()
@@ -58,6 +58,7 @@ type logger interface {
 
 func (ge *Orm) check() {
 	t := time.NewTicker(time.Millisecond * 10)
+CHECKING:
 	for {
 		select {
 		case <-t.C:
@@ -81,7 +82,7 @@ func (ge *Orm) check() {
 					db.Close()
 				}
 			}
-			return
+			break CHECKING
 		}
 	}
 	t.Stop()
@@ -93,21 +94,25 @@ func (ge *Orm) SetLogger(log logger) {
 	ge.DB.SetLogger(log)
 }
 
+// LogMode LogMode
 func (ge *Orm) LogMode(enable bool) *gorm.DB {
 	ge.loggerMode = &enable
 	return ge.DB.LogMode(enable)
 }
 
+// BlockGlobalUpdate BlockGlobalUpdate
 func (ge *Orm) BlockGlobalUpdate(enable bool) *gorm.DB {
 	ge.blockGlobalUpdate = &enable
 	return ge.DB.BlockGlobalUpdate(enable)
 }
 
+// SingularTable SingularTable
 func (ge *Orm) SingularTable(enable bool) {
 	ge.singularTable = &enable
 	ge.DB.SingularTable(enable)
 }
 
+// NewOrm NewOrm
 func NewOrm(cfg config.OrmEngineConfig) (*Orm, error) {
 	if e := cfg.Verify(); e != nil {
 		return nil, e
@@ -139,7 +144,7 @@ func NewOrm(cfg config.OrmEngineConfig) (*Orm, error) {
 		}
 	}
 	if masterIndex == -1 {
-		return nil, fmt.Errorf("%v. [%v]", config.NoAvailableHost, err)
+		return nil, fmt.Errorf("%v. [%v]", config.ErrNoAvailableHost, err)
 	}
 
 	// master保证在0位
