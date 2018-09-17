@@ -1,12 +1,18 @@
 package checker
 
+// Checker Checker
 type Checker interface {
 	Ping() error
 	ReConnect() error
+	Info() string
 }
 
+// Checkers Checkers
 type Checkers []Checker
 
+// CheckAndReplace 监测是否可用
+// 如果不可用会调用replace方法
+// replace方法如果返回false，则会继续查找下一个可用连接
 func (cs *Checkers) CheckAndReplace(repalce func(newOne int) bool) {
 	if len(*cs) == 0 {
 		return

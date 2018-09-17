@@ -1,12 +1,21 @@
 package gengine
 
-import "github.com/jinzhu/gorm"
+import (
+	"fmt"
+
+	"github.com/jinzhu/gorm"
+)
 
 // GormEngineChecker GormEngineChecker
 type GormEngineChecker struct {
 	*gorm.DB
 	uri    string
 	diaect string
+}
+
+// Info Info
+func (gec *GormEngineChecker) Info() string {
+	return fmt.Sprintf("uri:%s, diaect:%s", gec.uri, gec.diaect)
 }
 
 // Ping Ping

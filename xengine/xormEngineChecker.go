@@ -1,6 +1,8 @@
 package xengine
 
 import (
+	"fmt"
+
 	"github.com/go-xorm/xorm"
 )
 
@@ -9,6 +11,11 @@ type XormEngineChecker struct {
 	*xorm.Engine
 	uri    string
 	diaect string
+}
+
+// Info Info
+func (xec *XormEngineChecker) Info() string {
+	return fmt.Sprintf("uri:%s, diaect:%s", xec.uri, xec.diaect)
 }
 
 // Ping Ping

@@ -7,6 +7,7 @@ import (
 
 	"gitee.com/JMArch/hornet/checker"
 	"gitee.com/JMArch/hornet/config"
+	"gitee.com/JMArch/hornet/log"
 	"github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
 )
@@ -105,7 +106,7 @@ CHECKING:
 				if newOne >= 0 && newOne < len(xe.dbs) {
 					newDB := xe.dbs[newOne]
 					if db, ok := newDB.(*XormEngineChecker); ok {
-						fmt.Println("replace", newOne, db.uri)
+						log.Logf("select new db", db.Info())
 						xe.Engine = db.Engine
 						xe.repair()
 						return true

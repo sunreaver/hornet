@@ -7,6 +7,7 @@ import (
 
 	"gitee.com/JMArch/hornet/checker"
 	"gitee.com/JMArch/hornet/config"
+	"gitee.com/JMArch/hornet/log"
 	"github.com/jinzhu/gorm"
 )
 
@@ -67,7 +68,7 @@ CHECKING:
 				if newOne >= 0 && newOne < len(ge.dbs) {
 					newDB := ge.dbs[newOne]
 					if db, ok := newDB.(*GormEngineChecker); ok {
-						fmt.Println("replace", newOne, db.uri)
+						log.Logf("select new db", db.Info())
 						ge.DB = db.DB
 						ge.repair()
 						return true
