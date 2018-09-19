@@ -118,7 +118,8 @@ CHECKING:
 			xe.Engine.Close()
 			for _, d := range xe.dbs {
 				if db, ok := d.(*XormEngineChecker); ok {
-					db.Close()
+					err := db.Close()
+					log.Logf("xengine close at", db.Info(), "err", err)
 				}
 			}
 			break CHECKING

@@ -80,7 +80,8 @@ CHECKING:
 			ge.DB.Close()
 			for _, d := range ge.dbs {
 				if db, ok := d.(*GormEngineChecker); ok {
-					db.Close()
+					err := db.Close()
+					log.Logf("gengine close at", db.Info(), "err", err)
 				}
 			}
 			break CHECKING
