@@ -21,16 +21,33 @@ func (cs *Checkers) CheckAndReplace(repalce func(newOne int) bool) {
 	if master.Ping() == nil {
 		return
 	}
-	// 重选
-	for i := 0; i < len(*cs); i++ {
+	hadReplace := false
+	// 重选 从1开始Ping
+	for i := 1; i < len(*cs); i++ {
 		c := (*cs)[i]
-		if c.Ping() == nil || c.ReConnect() == nil {
-			// 可用ping通
-			// 重连后没问题
+		if c.Ping() == nil {
+			// 可Ping通
 			if repalce(i) {
+				hadReplace = true
 				// 保持master在0位
 				(*cs)[0], (*cs)[i] = (*cs)[i], (*cs)[0]
 				break
+			}
+		}
+	}
+	if !hadReplace {
+		// 所有备用节点都未替换成功
+		// 重选 从0开始Reconnet
+		for i := 0; i < len(*cs); i++ {
+			c := (*cs)[i]
+			if c.ReConnect() == nil {
+				// 重连后没问题
+				if repalce(i) {
+					hadReplace = true
+					// 保持master在0位
+					(*cs)[0], (*cs)[i] = (*cs)[i], (*cs)[0]
+					break
+				}
 			}
 		}
 	}

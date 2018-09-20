@@ -58,7 +58,7 @@ type logger interface {
 }
 
 func (ge *Orm) check() {
-	t := time.NewTicker(time.Millisecond * 10)
+	t := time.NewTicker(time.Second)
 CHECKING:
 	for {
 		select {
