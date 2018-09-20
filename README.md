@@ -59,7 +59,7 @@ func main() {
 	if e != nil {
 		panic(e.Error())
 	}
-	db := dbTmp.(*gengine.GormEngine)
+	db := dbTmp.(*gengine.Orm)
 
 	// Do Your Business logic
 	// db.FirstOrCreate(...)
@@ -96,7 +96,7 @@ func main() {
 		panic(e.Error())
 	}
 
-	db := dbTmp.(*gengine.GormEngine)
+	db := dbTmp.(*xengine.Orm)
 
 	// Do Your Business logic
 	// db.Insert(...)
