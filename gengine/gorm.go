@@ -14,8 +14,10 @@ import (
 // Orm Orm
 type Orm struct {
 	*gorm.DB
-	lock sync.RWMutex
-	dbs  checker.Checkers
+	lock       sync.RWMutex
+	dbs        checker.Checkers
+	dbsRepair  []int64
+	lastRepair int64
 
 	log               *logger
 	loggerMode        *bool
@@ -39,6 +41,7 @@ func (ge *Orm) DestroyEngine() bool {
 }
 
 func (ge *Orm) repair() {
+	log.Logf("repair new db")
 	if ge.log != nil {
 		ge.DB.SetLogger(*ge.log)
 	}
@@ -70,7 +73,10 @@ CHECKING:
 					if db, ok := newDB.(*GormEngineChecker); ok {
 						log.Logf("select new db", db.Info())
 						ge.DB = db.DB
-						ge.repair()
+						if ge.dbsRepair[newOne] != ge.lastRepair {
+							ge.repair()
+							ge.dbsRepair[newOne] = ge.lastRepair
+						}
 						return true
 					}
 				}
@@ -92,24 +98,28 @@ CHECKING:
 
 // SetLogger 设置logger（拦截logger设置）
 func (ge *Orm) SetLogger(log logger) {
+	ge.lastRepair = time.Now().UnixNano()
 	ge.log = &log
 	ge.DB.SetLogger(log)
 }
 
 // LogMode LogMode
 func (ge *Orm) LogMode(enable bool) *gorm.DB {
+	ge.lastRepair = time.Now().UnixNano()
 	ge.loggerMode = &enable
 	return ge.DB.LogMode(enable)
 }
 
 // BlockGlobalUpdate BlockGlobalUpdate
 func (ge *Orm) BlockGlobalUpdate(enable bool) *gorm.DB {
+	ge.lastRepair = time.Now().UnixNano()
 	ge.blockGlobalUpdate = &enable
 	return ge.DB.BlockGlobalUpdate(enable)
 }
 
 // SingularTable SingularTable
 func (ge *Orm) SingularTable(enable bool) {
+	ge.lastRepair = time.Now().UnixNano()
 	ge.singularTable = &enable
 	ge.DB.SingularTable(enable)
 }
@@ -152,10 +162,11 @@ func NewOrm(cfg config.OrmEngineConfig) (*Orm, error) {
 	// master保证在0位
 	dbs[0], dbs[masterIndex] = dbs[masterIndex], dbs[0]
 	out := &Orm{
-		lock: sync.RWMutex{},
-		DB:   master,
-		dbs:  dbs,
-		stop: make(chan bool, 1),
+		lock:      sync.RWMutex{},
+		DB:        master,
+		dbs:       dbs,
+		dbsRepair: make([]int64, len(dbs)),
+		stop:      make(chan bool, 1),
 	}
 
 	go out.check()

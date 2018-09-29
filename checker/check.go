@@ -7,6 +7,8 @@ type Checker interface {
 	Info() string
 }
 
+var checkIndex int
+
 // Checkers Checkers
 type Checkers []Checker
 
@@ -17,35 +19,34 @@ func (cs *Checkers) CheckAndReplace(repalce func(newOne int) bool) {
 	if len(*cs) == 0 {
 		return
 	}
-	master := (*cs)[0]
-	if master.Ping() == nil {
-		return
-	}
+	count := len(*cs)
+	// master := (*cs)[0]
+	// if master.Ping() == nil {
+	// 	return
+	// }
 	hadReplace := false
-	// 重选 从1开始Ping
-	for i := 1; i < len(*cs); i++ {
-		c := (*cs)[i]
+	// 重选 从checkIndex + 1开始Ping
+	for i := checkIndex + 1; i < count+checkIndex; i++ {
+		index := i % count
+		c := (*cs)[index]
 		if c.Ping() == nil {
 			// 可Ping通
-			if repalce(i) {
+			if repalce(index) {
 				hadReplace = true
-				// 保持master在0位
-				(*cs)[0], (*cs)[i] = (*cs)[i], (*cs)[0]
+				checkIndex = index
 				break
 			}
 		}
 	}
 	if !hadReplace {
 		// 所有备用节点都未替换成功
-		// 重选 从0开始Reconnet
-		for i := 0; i < len(*cs); i++ {
-			c := (*cs)[i]
+		for i := checkIndex + 1; i < count+checkIndex; i++ {
+			index := i % count
+			c := (*cs)[index]
 			if c.ReConnect() == nil {
-				// 重连后没问题
-				if repalce(i) {
+				if repalce(index) {
 					hadReplace = true
-					// 保持master在0位
-					(*cs)[0], (*cs)[i] = (*cs)[i], (*cs)[0]
+					checkIndex = index
 					break
 				}
 			}
