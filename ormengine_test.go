@@ -3,9 +3,9 @@ package hornet
 import (
 	"testing"
 
-	"gitee.com/JMArch/hornet/config"
-	"gitee.com/JMArch/hornet/gengine"
-	"gitee.com/JMArch/hornet/xengine"
+	"github.com/sunreaver/hornet/config"
+	"github.com/sunreaver/hornet/gengine"
+	"github.com/sunreaver/hornet/xengine"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/core"
 	_ "github.com/jinzhu/gorm/dialects/mysql"

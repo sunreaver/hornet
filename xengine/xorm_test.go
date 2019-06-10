@@ -5,9 +5,9 @@ import (
 	"sync"
 	"testing"
 
-	"gitee.com/JMArch/hornet/config"
 	_ "github.com/go-sql-driver/mysql"
 	. "github.com/smartystreets/goconvey/convey"
+	"github.com/sunreaver/hornet/config"
 )
 
 var (

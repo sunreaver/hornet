@@ -5,7 +5,7 @@ import (
 	"sync"
 	"testing"
 
-	"gitee.com/JMArch/hornet/config"
+	"github.com/sunreaver/hornet/config"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	. "github.com/smartystreets/goconvey/convey"
 )

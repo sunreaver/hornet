@@ -3,9 +3,9 @@ package hornet
 import (
 	"errors"
 
-	"gitee.com/JMArch/hornet/config"
-	"gitee.com/JMArch/hornet/gengine"
-	"gitee.com/JMArch/hornet/xengine"
+	"github.com/sunreaver/hornet/config"
+	"github.com/sunreaver/hornet/gengine"
+	"github.com/sunreaver/hornet/xengine"
 )
 
 // NewGorm NewGorm
